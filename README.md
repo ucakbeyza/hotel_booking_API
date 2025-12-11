@@ -685,53 +685,6 @@ curl -X POST http://localhost:8000/api/rooms/delete \
 
 ## Reservations Endpoints
 
-### GET /reservations
-
-Retrieves a list of all reservations in the system.
-
-**Endpoint:** `GET /api/reservations`
-
-**Description:** Returns all reservations with their associated room information.
-
-**Request Example:**
-```bash
-curl -X GET http://localhost:8000/api/reservations
-```
-
-**Response (200 OK):**
-```json
-{
-  "meta": {
-    "status": true,
-    "code": 200,
-    "message": "OK"
-  },
-  "data": [
-    {
-      "id": 1,
-      "room_id": 1,
-      "guest_name": "John Doe",
-      "guest_email": "john@example.com",
-      "start_date": "2025-12-10",
-      "end_date": "2025-12-15",
-      "status": "pending",
-      "room": {
-        "id": 1,
-        "hotel_id": 1,
-        "room_number": "101",
-        "type": "Double",
-        "price": "250.00",
-        "status": "booked"
-      },
-      "created_at": "2025-12-05T19:00:00.000000Z",
-      "updated_at": "2025-12-05T19:00:00.000000Z"
-    }
-  ]
-}
-```
-
----
-
 ### GET /reservations/{id}
 
 Retrieves detailed information about a specific reservation by its ID.
@@ -982,7 +935,7 @@ curl -X POST http://localhost:8000/api/reservations/update \
   "meta": {
     "status": true,
     "code": 200,
-    "message": "OK"
+    "message": "Reservation updated successfully."
   },
   "data": {
     "id": 1,
@@ -1072,7 +1025,7 @@ curl -X POST http://localhost:8000/api/reservations/delete \
   "meta": {
     "status": true,
     "code": 200,
-    "message": "OK"
+    "message": "Reservation deleted successfully."
   },
   "data": null
 }
@@ -1232,12 +1185,7 @@ curl -X POST http://localhost:8000/api/reservations/update \
   }'
 ```
 
-#### 7. Get All Reservations
-```bash
-curl -X GET http://localhost:8000/api/reservations
-```
-
-#### 8. Delete a Reservation
+#### 7. Delete a Reservation
 ```bash
 curl -X POST http://localhost:8000/api/reservations/delete \
   -H "Content-Type: application/json" \
