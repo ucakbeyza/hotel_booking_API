@@ -49,10 +49,11 @@ class RoomController extends Controller
     public function delete(DeleteRoomRequest $request)
     {
         $room = Room::findOrFail($request->id);
-        if($room->bookings()->exists()) {
+        //rezervasion booked rooms cannot be deleted
+        if($room->status === 'booked'){
             return ResponseBuilder::error(
                 [],
-                'Cannot delete room with existing bookings.', 400
+                'Cannot delete a booked room.', 400
             );
         }
         $room->delete();

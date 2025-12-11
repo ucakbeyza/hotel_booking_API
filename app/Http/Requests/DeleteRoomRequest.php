@@ -22,7 +22,7 @@ class DeleteRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:hotels,id',
+            'id' => 'required|integer|exists:rooms,id',
         ];
     }
 }
