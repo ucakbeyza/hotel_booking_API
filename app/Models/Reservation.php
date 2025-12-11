@@ -23,12 +23,25 @@ class Reservation extends Model
     {
         return $this->belongsTo(Room::class);
     }
-    public function hasConflict($startDate, $endDate)
+    public static function hasConflict($roomId, $startDate, $endDate, $excludeId = null)
     {
-        return self::where('room_id', $this->room_id)
-        ->where('id', '!=', $this->id)
-        ->where('start_date', '<', $endDate)
-        ->where('end_date', '>', $startDate)
-        ->exists();
+        $query = self::where('room_id', $roomId)
+            ->where('status', '!=', 'canceled')
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->whereBetween('start_date', [$startDate, $endDate])
+                        ->orWhereBetween('end_date', [$startDate, $endDate])
+                        ->orWhere(function ($dateQ) use ($startDate, $endDate) {
+                            $dateQ->where('start_date', '<=', $startDate)
+                                ->where('end_date', '>=', $endDate);
+                        });
+                });
+            });
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
     }
 }

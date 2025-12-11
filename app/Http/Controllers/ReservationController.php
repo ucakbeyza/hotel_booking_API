@@ -15,12 +15,19 @@ use App\Http\Requests\DeleteReservationRequest;
 
 class ReservationController extends Controller
 {
+    public function index()
+    {
+        $reservations = Reservation::with('room')->get();
+        return ResponseBuilder::success(ReservationResource::collection($reservations));
+    }
+
     public function create(CreateReservationRequest $request)
     {
         if(Reservation::hasConflict(
             $request->room_id, 
             $request->start_date, 
-            $request->end_date
+            $request->end_date,
+            null
         )){
             return ResponseBuilder::error(
                 [],
@@ -28,7 +35,7 @@ class ReservationController extends Controller
                 409
             );
         }
-        $room = Room::finOrFail($request->room_id);
+        $room = Room::findOrFail($request->room_id);
         if($room->status !== 'available'){
             return ResponseBuilder::error(
                 [],
@@ -72,14 +79,14 @@ class ReservationController extends Controller
             new ReservationResource($reservation)
         );
     }
-    public function update(UpdateReservationRequest $request)
+    public function update(UpdateReservationRequest $request, $id)
     {
-        $reservation = Reservation::with('room')->findOrFail($request->id);
+        $reservation = Reservation::with('room')->findOrFail($id);
 
-        if ($reservation->status === 'cancelled') {
+        if ($reservation->status === 'canceled') {
             return ResponseBuilder::error(
                 [],
-                'Cannot update a cancelled reservation.',
+                'Cannot update a canceled reservation.',
                 400
             );
         }
@@ -113,10 +120,10 @@ class ReservationController extends Controller
             if ($request->has('status')) {
                 $newStatus = $request->status;
 
-                if ($newStatus === 'cancelled') {
+                if ($newStatus === 'canceled') {
                     $reservation->room->update(['status' => 'available']);
                 }
-                elseif ($oldStatus === 'cancelled' && in_array($newStatus, ['pending', 'confirmed'])) {
+                elseif ($oldStatus === 'canceled' && in_array($newStatus, ['pending', 'confirmed'])) {
                     $reservation->room->update(['status' => 'booked']);
                 }
             }
@@ -140,9 +147,9 @@ class ReservationController extends Controller
             );
         }
     }
-    public function delete(DeleteReservationRequest $request)
+    public function delete($id)
     {
-        $reservation = Reservation::with('room')->findOrFail($request->id);
+        $reservation = Reservation::with('room')->findOrFail($id);
 
         DB::beginTransaction();
         try {

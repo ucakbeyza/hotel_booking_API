@@ -24,7 +24,7 @@ class RoomController extends Controller
             $endDate = $request->end_date;
 
             $query->whereDoesntHave('reservations', function ($q) use ($startDate, $endDate) {
-                $q->where('status', '!=', 'cancelled')
+                $q->where('status', '!=', 'canceled')
                   ->where(function ($subQ) use ($startDate, $endDate) {
                         $subQ->whereBetween('start_date', [$startDate, $endDate])
                             ->orWhereBetween('end_date', [$startDate, $endDate])

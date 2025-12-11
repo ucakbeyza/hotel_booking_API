@@ -17,6 +17,6 @@ Route::post('/rooms/update', [RoomController::class, 'update']);
 
 Route::get('/reservations', [App\Http\Controllers\ReservationController::class, 'index']);
 Route::get('/reservations/{id}', [App\Http\Controllers\ReservationController::class, 'show']);
-Route::post('/reservations/create', [App\Http\Controllers\ReservationController::class, 'create']);
-Route::post('/reservations/update', [App\Http\Controllers\ReservationController::class, 'update']);
-Route::post('/reservations/delete', [App\Http\Controllers\ReservationController::class, 'delete']);
+Route::post('/reservations', [App\Http\Controllers\ReservationController::class, 'create']);
+Route::put('/reservations/{id}', [App\Http\Controllers\ReservationController::class, 'update']);
+Route::delete('/reservations/{id}', [App\Http\Controllers\ReservationController::class, 'delete']);
