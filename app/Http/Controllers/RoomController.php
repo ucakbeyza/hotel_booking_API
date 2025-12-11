@@ -12,9 +12,32 @@ use App\Http\Requests\DeleteRoomRequest;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::all();
+        $query = Room::query();
+
+        if ($request->has('hotel_id')) {
+            $query->where('hotel_id', $request->hotel_id);
+        }
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->start_date;
+            $endDate = $request->end_date;
+
+            $query->whereDoesntHave('reservations', function ($q) use ($startDate, $endDate) {
+                $q->where('status', '!=', 'cancelled')
+                  ->where(function ($subQ) use ($startDate, $endDate) {
+                        $subQ->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($dateQ) use ($startDate, $endDate) {
+                               $dateQ->where('start_date', '<=', $startDate)
+                                     ->where('end_date', '>=', $endDate);
+                            });
+                    });
+            });
+            $query->where('status', 'available');
+        }
+
+        $rooms = $query->get();
         return ResponseBuilder::success(RoomResource::collection($rooms));
     }
     public function show($id)
